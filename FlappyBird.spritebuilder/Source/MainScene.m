@@ -13,6 +13,12 @@
     CCNode *_ground1;
     CCNode *_ground2;
     NSArray *_grounds;
+    CCNode *_cloud1;
+    CCNode *_cloud2;
+    NSArray *_clouds;
+    CCNode *_bush1;
+    CCNode *_bush2;
+    NSArray *_bushes;
     
     NSTimeInterval _sinceTouch;
     
@@ -32,6 +38,8 @@
     self.userInteractionEnabled = TRUE;
     
     _grounds = @[_ground1, _ground2];
+    _clouds = @[_cloud1, _cloud2];
+    _bushes = @[_bush1, _bush2];
     
     for (CCNode *ground in _grounds) {
         // set collision txpe
@@ -108,14 +116,12 @@
 
 #pragma mark - Update
 
-- (void)showScore
-{
+- (void)showScore {
     _scoreLabel.string = [NSString stringWithFormat:@"%d", points];
     _scoreLabel.visible = true;
 }
 
-- (void)update:(CCTime)delta
-{
+- (void)update:(CCTime)delta {
     _sinceTouch += delta;
     
     character.rotation = clampf(character.rotation, -30.f, 90.f);
@@ -162,17 +168,41 @@
         [_obstacles removeObject:obstacleToRemove];
     }
     
-    if (!_gameOver)
-    {
-        @try
-        {
+    if (!_gameOver) {
+        @try {
             character.physicsBody.velocity = ccp(80.f, clampf(character.physicsBody.velocity.y, -MAXFLOAT, 200.f));
             
             [super update:delta];
         }
-        @catch(NSException* ex)
-        {
-            
+        @catch(NSException* ex){
+        }
+    }
+    
+    // move and loop the bushes
+    for (CCNode *bush in _bushes) {
+        // move the bush
+        bush.position = ccp(bush.position.x -
+                            (character.physicsBody.velocity.x * delta), bush.position.y);
+        
+        // if the left corner is one complete width off the screen,
+        // move it to the right
+        if (bush.position.x <= (-1 * bush.contentSize.width)) {
+            bush.position = ccp(bush.position.x +
+                                2 * bush.contentSize.width, bush.position.y);
+        }
+    }
+    
+    // move and loop the clouds
+    for (CCNode *cloud in _clouds) {
+        // move the cloud
+        cloud.position = ccp(cloud.position.x -
+                             (character.physicsBody.velocity.x * delta), cloud.position.y);
+        
+        // if the left corner is one complete width off the screen,
+        // move it to the right
+        if (cloud.position.x <= (-1 * cloud.contentSize.width)) {
+            cloud.position = ccp(cloud.position.x +
+                                 2 * cloud.contentSize.width, cloud.position.y);
         }
     }
 }
