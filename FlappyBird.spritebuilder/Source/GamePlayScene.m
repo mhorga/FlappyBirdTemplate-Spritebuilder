@@ -7,6 +7,7 @@
 - (void)initialize {
     character = (Character *)[CCBReader load:@"Character"];
     [physicsNode addChild:character];
+    [self addObstacle];
 }
 
 - (void)update:(CCTime)delta {
